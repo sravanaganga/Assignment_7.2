@@ -1,0 +1,90 @@
+
+a) Top 5 employees (employee id and employee name) with highest rating.
+(In case two employees have same rating, employee with name coming first in dictionary
+should get preference)
+
+|   A = load '/home/acadgild/employee_details.txt' using PigStorage(',') as (id:int,name:chararray,sal:int,rating:int);
+|   
+|   B = ORDER A BY rating desc,name;
+|
+|   C = LIMIT B 5;
+|
+|   D = FOREACH C GENERATE id,name;
+|
+|   DUMP D;
+
+
+
+
+b) Top 3 employees (employee id and employee name) with highest salary, whose employee id
+is an odd number.
+(In case two employees have same salary, employee with name coming first in dictionary
+should get preference)
+
+|   A = load '/home/acadgild/employee_details.txt' using PigStorage(',') as (id:int,name:chararray,sal:int,rating:int);
+|
+|   B = FILTER A BY id%2==1;
+|
+|   C = ORDER B BY sal desc,name;
+|  
+|   D = LIMIT C 3; 
+|
+|   E = FOREACH D GENERATE id,name;
+|  
+|   DUMP E;
+
+
+c)Employee (employee id and employee name) with maximum expense
+(In case two employees have same expense, employee with name coming first in dictionary
+should get preference)
+
+|  A = load '/home/acadgild/employee_details.txt' using PigStorage(',') as (id:int,name:chararray,sal:int,rating:int);
+|   
+|  B = load '/home/acadgild/employee_expenses.txt' using PigStorage('\t') as (id:int,exp:int);
+|
+|  C = JOIN A BY id, B BY id;
+|
+|  D = ORDER C BY B::exp desc,A::name;
+|
+|  E = LIMIT D 1;
+|
+|  F = FOREACH E GENERATE A::id,A::name;
+|
+|  DUMP F;
+
+
+d) List of employees (employee id and employee name) having entries in employee_expenses
+file.
+
+
+|  A = load '/home/acadgild/employee_details.txt' using PigStorage(',') as (id:int,name:chararray,sal:int,rating:int);
+|   
+|  B = load '/home/acadgild/employee_expenses.txt' using PigStorage('\t') as (id:int,exp:int);
+|
+|  C = JOIN A BY id, B BY id;
+|
+|  D = FOREACH C GENERATE A::id,A::name;
+|
+|  E = DISTINCT D;
+|
+|  DUMP E;
+
+
+
+
+e) List of employees (employee id and employee name) having no entry in employee_expenses
+file.
+
+|  A = load '/home/acadgild/employee_details.txt' using PigStorage(',') as (id:int,name:chararray,sal:int,rating:int);
+|   
+|  B = load '/home/acadgild/employee_expenses.txt' using PigStorage('\t') as (id:int,exp:int);
+|
+|  C = JOIN A BY id LEFT OUTER,B BY id,
+|
+|  D = FOREACH C GENERATE A::id,A::name,B::exp;
+| 
+|  E = FILTER D BY B::exp is NULL;
+|
+|  F = FOREACH E GENERATE A::id,A::name;
+|
+|  DUMP F;
